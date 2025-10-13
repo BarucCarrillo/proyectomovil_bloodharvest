@@ -1,4 +1,4 @@
-//PANTALLA DE LOGIN
+//PANTALLA DE LOGIN Y REGISTRO
 
 import 'package:flutter/material.dart';
 import '../widgets/auth_form..dart';

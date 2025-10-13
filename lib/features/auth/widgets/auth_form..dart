@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+// FORMULARIO DE AUTENTICACION PARA LOGIN Y REGISTRO
+
 class AuthForm extends StatefulWidget {
   final bool isLogin;
   final Function(String email, String password, [String? displayName]) onSubmit;

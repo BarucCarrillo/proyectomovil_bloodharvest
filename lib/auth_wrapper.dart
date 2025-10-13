@@ -1,4 +1,4 @@
-// WRAPPER QUE DECIDE SI MOSTRAR LOGIN O HOME SEGUN EL ESTADO DE AUTENTICACION
+// WRAPPER QUE DECIDE SI MOSTRAR LOGIN O HOME SEGUN EL ESTADO ACTUAL DE AUTENTICACION
 
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
