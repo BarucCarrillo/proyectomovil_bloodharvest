@@ -36,13 +36,32 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(isLogin ? 'Iniciar Sesión' : 'Crear Cuenta')),
+      backgroundColor: Colors.brown[300],
+      appBar: AppBar(
+        backgroundColor: Colors.brown[300],
+        centerTitle: true,
+        title: Text(
+          isLogin ? 'Iniciar Sesión' : 'Crear Cuenta',
+          style: TextStyle(
+            fontSize: 32,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+            letterSpacing: 1.5,
+          ),
+        ),
+      ),
       body: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             AuthForm(isLogin: isLogin, onSubmit: _handleAuth),
+            SizedBox(height: 20),
             TextButton(
+              style: TextButton.styleFrom(
+                backgroundColor: Colors.brown,
+                foregroundColor: Colors.white,
+                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              ),
               onPressed: () => setState(() => isLogin = !isLogin),
               child: Text(
                 isLogin
@@ -50,27 +69,32 @@ class _LoginPageState extends State<LoginPage> {
                     : '¿Ya tienes cuenta? Inicia Sesión',
               ),
             ),
-            if (isLogin)
-              TextButton(
-                onPressed: () async {
-                  final email = await _askForEmail(context);
-                  if (email != null && email.contains('@')) {
-                    try {
-                      await _authService.sendPasswordResetEmail(email);
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('EMial de recuperación enviado'),
-                        ),
-                      );
-                    } catch (e) {
-                      ScaffoldMessenger.of(
-                        context,
-                      ).showSnackBar(SnackBar(content: Text(e.toString())));
-                    }
-                  }
-                },
-                child: const Text('Olvidé mi contraseña'),
+            if (isLogin) SizedBox(height: 20),
+            TextButton(
+              style: TextButton.styleFrom(
+                backgroundColor: Colors.brown,
+                foregroundColor: Colors.white,
+                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
               ),
+              onPressed: () async {
+                final email = await _askForEmail(context);
+                if (email != null && email.contains('@')) {
+                  try {
+                    await _authService.sendPasswordResetEmail(email);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Email de recuperación enviado'),
+                      ),
+                    );
+                  } catch (e) {
+                    ScaffoldMessenger.of(
+                      context,
+                    ).showSnackBar(SnackBar(content: Text(e.toString())));
+                  }
+                }
+              },
+              child: const Text('Olvidé mi contraseña'),
+            ),
           ],
         ),
       ),

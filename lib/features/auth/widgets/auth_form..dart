@@ -43,6 +43,8 @@ class _AuthFormState extends State<AuthForm> {
   @override
   Widget build(BuildContext context) {
     return Card(
+      shadowColor: Colors.black,
+      color: Colors.brown,
       margin: const EdgeInsets.symmetric(horizontal: 24),
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -56,31 +58,41 @@ class _AuthFormState extends State<AuthForm> {
                   controller: nameCtrl,
                   decoration: const InputDecoration(
                     labelText: 'Nombre de Usuario',
+                    labelStyle: TextStyle(color: Colors.white),
                   ),
                   validator: (v) =>
                       v == null || v.isEmpty ? 'Ingresa tu nombre' : null,
                 ),
               TextFormField(
                 controller: emailCtrl,
-                decoration: const InputDecoration(labelText: 'Correo'),
+                decoration: const InputDecoration(
+                  labelText: 'Correo',
+                  labelStyle: TextStyle(color: Colors.white),
+                ),
                 keyboardType: TextInputType.emailAddress,
                 validator: (v) =>
                     v != null && v.contains('@') ? null : 'Correo Invalido',
               ),
               TextFormField(
                 controller: passCtrl,
-                decoration: const InputDecoration(labelText: 'Contraseña'),
+                decoration: const InputDecoration(
+                  labelText: 'Contraseña',
+                  labelStyle: TextStyle(color: Colors.white),
+                ),
                 obscureText: true,
                 validator: (v) =>
                     v != null && v.length >= 8 ? null : 'Minimo 8 caracteres',
               ),
-              const SizedBox(height: 12),
               if (isLoading) const CircularProgressIndicator(),
-              if (!isLoading)
-                ElevatedButton(
-                  onPressed: submit,
-                  child: Text(widget.isLogin ? 'Entrar' : 'Registrar'),
+              if (!isLoading) SizedBox(height: 20),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.brown[300],
+                  foregroundColor: Colors.white,
                 ),
+                onPressed: submit,
+                child: Text(widget.isLogin ? 'Entrar' : 'Registrar'),
+              ),
             ],
           ),
         ),
