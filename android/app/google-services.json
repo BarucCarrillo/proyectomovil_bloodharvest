@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "2796854479",
+    "project_id": "proyectomovil-bloodharvest",
+    "storage_bucket": "proyectomovil-bloodharvest.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:2796854479:android:c4ad6a07c5dd9c01deebba",
+        "android_client_info": {
+          "package_name": "com.example.proyectomovil_bloodharvest"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCwLk3Pk4SinJq6X9AKcXzjWoz0tgUSo0c"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
