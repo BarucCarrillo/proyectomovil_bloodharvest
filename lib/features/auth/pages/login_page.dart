@@ -40,13 +40,15 @@ class _LoginPageState extends State<LoginPage> {
       appBar: AppBar(
         backgroundColor: Colors.brown[300],
         centerTitle: true,
+        titleSpacing: 0,
+        toolbarHeight: 180,
         title: Text(
-          isLogin ? 'Iniciar Sesión' : 'Crear Cuenta',
+          'Bienvenido a la\n comunidad de\n Blood Harvest\n\n ${isLogin ? 'Iniciar Sesión' : 'Crear Cuenta'}',
           style: TextStyle(
-            fontSize: 32,
+            fontSize: 26,
             fontWeight: FontWeight.bold,
             color: Colors.white,
-            letterSpacing: 1.5,
+            letterSpacing: 2.5,
           ),
         ),
       ),
