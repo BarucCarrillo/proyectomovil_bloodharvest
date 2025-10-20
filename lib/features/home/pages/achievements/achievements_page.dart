@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'achievements_service.dart';
 import 'add_achievement_dialog.dart';
+import 'package:intl/intl.dart';
 
 class AchievementsPage extends StatelessWidget {
   const AchievementsPage({super.key});
@@ -35,12 +36,31 @@ class AchievementsPage extends StatelessWidget {
             itemCount: achievements.length,
             itemBuilder: (context, index) {
               final data = achievements[index];
+
+              //FORMATEO DE FECHAS
+              final timestamp = data['date'] as Timestamp;
+              final date = timestamp.toDate();
+              final formattedDate = DateFormat('dd/MM/yyyy').format(date);
               return Card(
                 margin: const EdgeInsets.symmetric(vertical: 8),
                 child: ListTile(
                   leading: const Icon(Icons.star, color: Colors.amber),
                   title: Text(data['title']),
-                  subtitle: Text(data['description']),
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(data['description']),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Fecha: $formattedDate',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ],
+                  ),
+                  isThreeLine: true,
                   trailing: IconButton(
                     onPressed: () =>
                         achievementsService.deleteAchievement(data.id),
