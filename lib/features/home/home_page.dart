@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../core/services/auth_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'pages/achievements/achievements_page.dart';
-import 'pages/friends_page.dart';
+import '../achievements/achievements_page.dart';
+import '../friends/friends_page.dart';
 import 'pages/news_page.dart';
 
 //VIATA DE PRUEBA PARA MOSTRAR DATOS BASICOS DEL USUARIO LOGEADO Y BOTON DE CERRAR SESION
