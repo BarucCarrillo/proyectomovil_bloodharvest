@@ -4,6 +4,7 @@ import 'package:proyectomovil_bloodharvest/features/achievements/achievements_pa
 import 'package:proyectomovil_bloodharvest/features/friends/friends_page.dart';
 import 'package:proyectomovil_bloodharvest/features/friends/requests_page.dart';
 import 'package:proyectomovil_bloodharvest/features/home/home_page.dart';
+import 'package:proyectomovil_bloodharvest/features/friends/chat_page.dart';
 import 'firebase_options.dart';
 import 'auth_wrapper.dart';
 
@@ -27,8 +28,20 @@ class MyApp extends StatelessWidget {
       routes: {
         '/home': (context) => const HomePage(),
         '/friends': (context) => const FriendsPage(),
-        '/achievements': (context) => AchievementsPage(),
-        '/requests_page': (context) => RequestsPage(),
+        '/achievements': (context) => const AchievementsPage(),
+        '/requests_page': (context) => const RequestsPage(),
+      },
+      onGenerateRoute: (settings) {
+        if (settings.name == '/chat_page') {
+          final args = settings.arguments as Map<String, dynamic>;
+          return MaterialPageRoute(
+            builder: (context) => ChatPage(
+              friendUid: args['friendId'],
+              friendName: args['friendName'],
+            ),
+          );
+        }
+        return null;
       },
     );
   }

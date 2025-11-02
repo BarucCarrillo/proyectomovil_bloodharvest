@@ -15,43 +15,123 @@ class FriendsPage extends StatelessWidget {
       appBar: AppBar(
         actions: [
           IconButton(
-            icon: Icon(Icons.person_add_alt_1),
+            icon: const Icon(Icons.person_add_alt_1),
             onPressed: () => Navigator.pushNamed(context, '/requests_page'),
           ),
         ],
       ),
-      body: StreamBuilder<QuerySnapshot>(
-        stream: FirebaseFirestore.instance.collection('users').snapshots(),
-        builder: (context, snapshot) {
-          if (!snapshot.hasData) {
+      body: StreamBuilder<DocumentSnapshot>(
+        stream: FirebaseFirestore.instance
+            .collection('users')
+            .doc(currentUser.uid)
+            .snapshots(),
+        builder: (context, currentUserSnapshot) {
+          if (!currentUserSnapshot.hasData) {
             return const Center(child: CircularProgressIndicator());
           }
 
-          final users = snapshot.data!.docs
-              .where((u) => u.id != currentUser.uid)
-              .toList();
+          final currentData =
+              currentUserSnapshot.data!.data() as Map<String, dynamic>;
+          final List<dynamic> friends = currentData['friends'] ?? [];
 
-          return ListView.builder(
-            itemCount: users.length,
-            itemBuilder: (context, index) {
-              final data = users[index].data() as Map<String, dynamic>;
-              final targetId = users[index].id;
+          return StreamBuilder<QuerySnapshot>(
+            stream: FirebaseFirestore.instance.collection('users').snapshots(),
+            builder: (context, snapshot) {
+              if (!snapshot.hasData) {
+                return const Center(child: CircularProgressIndicator());
+              }
 
-              return ListTile(
-                title: Text(data['displayName'] ?? 'Usuario'),
-                subtitle: Text(data['email']),
-                trailing: IconButton(
-                  icon: Icon(Icons.person_add_alt_1),
-                  onPressed: () async {
-                    await friendsService.sendFriendRequest(
-                      currentUser.uid,
-                      targetId,
+              final users = snapshot.data!.docs
+                  .where((u) => u.id != currentUser.uid)
+                  .toList();
+
+              // 🔹 Filtramos amigos y no amigos
+              final friendsList = users
+                  .where((u) => friends.contains(u.id))
+                  .toList(); // amigos
+              final othersList = users
+                  .where((u) => !friends.contains(u.id))
+                  .toList(); // otros usuarios
+
+              return ListView(
+                children: [
+                  const Padding(
+                    padding: EdgeInsets.all(12.0),
+                    child: Text(
+                      'Mis Amigos',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+
+                  // 🔹 Lista de amigos
+                  if (friendsList.isEmpty)
+                    const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 16),
+                      child: Text('No tienes amigos todavía'),
+                    )
+                  else
+                    ...friendsList.map((doc) {
+                      final data = doc.data() as Map<String, dynamic>;
+                      return ListTile(
+                        leading: const CircleAvatar(child: Icon(Icons.person)),
+                        title: Text(data['displayName'] ?? 'Jugador'),
+                        subtitle: Text(data['email'] ?? ''),
+                        trailing: IconButton(
+                          icon: const Icon(Icons.chat),
+                          onPressed: () {
+                            Navigator.pushNamed(
+                              context,
+                              '/chat_page',
+                              arguments: {
+                                'friendId': doc.id,
+                                'friendName': data['displayName'] ?? 'Jugador',
+                              },
+                            );
+                          },
+                        ),
+                      );
+                    }),
+
+                  const Padding(
+                    padding: EdgeInsets.all(12.0),
+                    child: Text(
+                      'Otros Jugadores',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+
+                  // 🔹 Lista de otros usuarios
+                  ...othersList.map((doc) {
+                    final data = doc.data() as Map<String, dynamic>;
+                    return ListTile(
+                      leading: const CircleAvatar(
+                        child: Icon(Icons.person_outline),
+                      ),
+                      title: Text(data['displayName'] ?? 'Jugador'),
+                      subtitle: Text(data['email'] ?? ''),
+                      trailing: ElevatedButton(
+                        onPressed: () async {
+                          await friendsService.sendFriendRequest(
+                            currentUser.uid,
+                            doc.id,
+                          );
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Solicitud enviada ✅'),
+                            ),
+                          );
+                        },
+                        child: const Text('Agregar'),
+                      ),
                     );
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Solicitud enviada')),
-                    );
-                  },
-                ),
+                  }),
+                ],
               );
             },
           );
