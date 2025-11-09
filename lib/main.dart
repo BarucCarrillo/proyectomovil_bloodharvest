@@ -30,6 +30,7 @@ class MyApp extends StatelessWidget {
         '/friends': (context) => const FriendsPage(),
         '/achievements': (context) => const AchievementsPage(),
         '/requests_page': (context) => const RequestsPage(),
+        '/friends_achievements_page': (context) => RequestsPage(),
       },
       onGenerateRoute: (settings) {
         if (settings.name == '/chat_page') {

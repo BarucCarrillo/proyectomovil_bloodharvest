@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import './services/friends_service.dart';
+import '../friends/friend_achievements_page.dart';
 
 class FriendsPage extends StatelessWidget {
   const FriendsPage({super.key});
@@ -66,7 +67,7 @@ class FriendsPage extends StatelessWidget {
                     ),
                   ),
 
-                  // 🔹 Lista de amigos
+                  // Lista de amigos
                   if (friendsList.isEmpty)
                     const Padding(
                       padding: EdgeInsets.symmetric(horizontal: 16),
@@ -76,7 +77,28 @@ class FriendsPage extends StatelessWidget {
                     ...friendsList.map((doc) {
                       final data = doc.data() as Map<String, dynamic>;
                       return ListTile(
-                        leading: const CircleAvatar(child: Icon(Icons.person)),
+                        leading: GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => FriendAchievementsPage(
+                                  friendUid: doc.id,
+                                  friendDisplayName:
+                                      data['displayName'] ?? 'Jugador',
+                                ),
+                              ),
+                            );
+                          },
+                          child: CircleAvatar(
+                            backgroundImage: data['photoUrl'] != null
+                                ? NetworkImage(data['photoUrl'])
+                                : null,
+                            child: data['photoUrl'] == null
+                                ? const Icon(Icons.person)
+                                : null,
+                          ),
+                        ),
                         title: Text(data['displayName'] ?? 'Jugador'),
                         subtitle: Text(data['email'] ?? ''),
                         trailing: IconButton(
@@ -106,7 +128,7 @@ class FriendsPage extends StatelessWidget {
                     ),
                   ),
 
-                  // 🔹 Lista de otros usuarios
+                  //Lista de otros usuarios
                   ...othersList.map((doc) {
                     final data = doc.data() as Map<String, dynamic>;
                     return ListTile(
