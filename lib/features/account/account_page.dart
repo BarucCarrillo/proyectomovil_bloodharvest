@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:proyectomovil_bloodharvest/core/services/auth_service.dart';
 
 class EditProfilePage extends StatefulWidget {
   const EditProfilePage({super.key});
@@ -61,6 +62,11 @@ class _EditProfilePageState extends State<EditProfilePage> {
       //Actualizar email en Firebase Auth (si cambió)
       if (newEmail.isNotEmpty && newEmail != user.email) {
         await user.verifyBeforeUpdateEmail(newEmail);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Se envió un correo de verificación al nuevo email.'),
+          ),
+        );
       }
 
       //Actualizar contraseña (solo si ingresó una nueva)
@@ -126,6 +132,19 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 prefixIcon: Icon(Icons.lock),
               ),
               obscureText: true,
+            ),
+            const SizedBox(height: 24),
+            ElevatedButton.icon(
+              onPressed: () async {
+                await AuthService().signOut();
+                if (context.mounted) {
+                  Navigator.of(
+                    context,
+                  ).pushNamedAndRemoveUntil('/', (route) => false);
+                }
+              },
+              icon: const Icon(Icons.logout),
+              label: const Text('Cerrar Sesión'),
             ),
             const SizedBox(height: 24),
             ElevatedButton.icon(

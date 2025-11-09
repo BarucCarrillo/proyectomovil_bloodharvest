@@ -58,7 +58,7 @@ class _AuthFormState extends State<AuthForm> {
                   controller: nameCtrl,
                   decoration: const InputDecoration(
                     labelText: 'Nombre de Usuario',
-                    labelStyle: TextStyle(color: Colors.white),
+                    labelStyle: TextStyle(color: Colors.black),
                   ),
                   validator: (v) =>
                       v == null || v.isEmpty ? 'Ingresa tu nombre' : null,
@@ -67,7 +67,7 @@ class _AuthFormState extends State<AuthForm> {
                 controller: emailCtrl,
                 decoration: const InputDecoration(
                   labelText: 'Correo',
-                  labelStyle: TextStyle(color: Colors.white),
+                  labelStyle: TextStyle(color: Colors.black),
                 ),
                 keyboardType: TextInputType.emailAddress,
                 validator: (v) =>
@@ -77,7 +77,7 @@ class _AuthFormState extends State<AuthForm> {
                 controller: passCtrl,
                 decoration: const InputDecoration(
                   labelText: 'Contraseña',
-                  labelStyle: TextStyle(color: Colors.white),
+                  labelStyle: TextStyle(color: Colors.black),
                 ),
                 obscureText: true,
                 validator: (v) =>

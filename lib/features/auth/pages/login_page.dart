@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import '../widgets/auth_form..dart';
 import '../../../core/services/auth_service.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -18,6 +19,20 @@ class _LoginPageState extends State<LoginPage> {
     try {
       if (isLogin) {
         await _authService.signInWithEmail(email, password);
+
+        final user = _authService.currentUser;
+        if (user != null) {
+          final firestore = FirebaseFirestore.instance;
+          final userDoc = firestore.collection('users').doc(user.uid);
+
+          final snapshot = await userDoc.get();
+          if (snapshot.exists) {
+            final firestoreEmail = snapshot['email'];
+            if (firestoreEmail != user.email) {
+              await userDoc.update({'email': user.email});
+            }
+          }
+        }
       } else {
         await _authService.registerWithEmail(
           email,
