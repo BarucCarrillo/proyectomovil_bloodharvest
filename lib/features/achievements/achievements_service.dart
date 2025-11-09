@@ -40,4 +40,23 @@ class AchievementsService {
         .doc(docId)
         .delete();
   }
+
+  Future<void> updateAchievement(
+    String id,
+    String title,
+    String description,
+    DateTime date,
+  ) async {
+    final uid = _auth.currentUser?.uid;
+    await _firestore
+        .collection('users')
+        .doc(uid)
+        .collection('achievements')
+        .doc(id)
+        .update({
+          'title': title,
+          'description': description,
+          'date': Timestamp.fromDate(date),
+        });
+  }
 }

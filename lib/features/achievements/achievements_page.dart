@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'achievements_service.dart';
 import 'add_achievement_dialog.dart';
+import 'edit_achievement_dialog.dart';
 import 'package:intl/intl.dart';
 
 class AchievementsPage extends StatelessWidget {
@@ -61,10 +62,28 @@ class AchievementsPage extends StatelessWidget {
                     ],
                   ),
                   isThreeLine: true,
-                  trailing: IconButton(
-                    onPressed: () =>
-                        achievementsService.deleteAchievement(data.id),
-                    icon: const Icon(Icons.delete, color: Colors.red),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.edit, color: Colors.blue),
+                        onPressed: () {
+                          showDialog(
+                            context: context,
+                            builder: (_) => EditAchievementDialog(
+                              achievementId: data.id,
+                              achievementData:
+                                  data.data() as Map<String, dynamic>,
+                            ),
+                          );
+                        },
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.delete, color: Colors.red),
+                        onPressed: () =>
+                            achievementsService.deleteAchievement(data.id),
+                      ),
+                    ],
                   ),
                 ),
               );
