@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:proyectomovil_bloodharvest/features/account/account_page.dart';
 import 'package:proyectomovil_bloodharvest/features/achievements/achievements_page.dart';
 import 'package:proyectomovil_bloodharvest/features/friends/friends_page.dart';
@@ -14,6 +15,11 @@ import 'auth_wrapper.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  await Supabase.initialize(
+    url: 'https://ljaswixhpkowjenkkdse.supabase.co',
+    anonKey:
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxqYXN3aXhocGtvd2plbmtrZHNlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI2NzAxNjMsImV4cCI6MjA3ODI0NjE2M30.HGnJZac50LCPxnkCvQPa8vUkSpm04Utw616DVy0KRjw',
+  );
   runApp(const MyApp());
 }
 
