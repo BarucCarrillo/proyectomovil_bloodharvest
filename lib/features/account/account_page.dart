@@ -54,7 +54,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     }
   }
 
-  // 🔹 Seleccionar imagen de galería
+  //Seleccionar imagen de galería
   Future<void> _pickImage() async {
     final picked = await _picker.pickImage(source: ImageSource.gallery);
     if (picked != null) {
@@ -64,7 +64,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     }
   }
 
-  // 🔹 Subir imagen a Firebase Storage y actualizar Firestore/Auth
+  //Subir imagen a Firebase Storage y actualizar Firestore/Auth
   Future<void> _uploadProfileImage() async {
     if (_imageFile == null) return;
 
@@ -74,7 +74,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
       final user = _auth.currentUser!;
       final filePath = 'profile_images/${user.uid}.jpeg';
 
-      // 🔹 Subir imagen a Supabase Storage
+      //Subir imagen a Supabase Storage
       await supabase.storage
           .from('profile_images')
           .upload(
@@ -83,17 +83,17 @@ class _EditProfilePageState extends State<EditProfilePage> {
             fileOptions: const FileOptions(upsert: true),
           );
 
-      // 🔹 Obtener URL pública
+      //Obtener URL pública
       final publicUrl = supabase.storage
           .from('profile_images')
           .getPublicUrl(filePath);
 
-      // 🔹 Actualizar Firestore
+      //Actualizar Firestore
       await _firestore.collection('users').doc(user.uid).update({
         'photoUrl': publicUrl,
       });
 
-      // 🔹 Actualizar en Firebase Auth
+      //Actualizar en Firebase Auth
       await user.updatePhotoURL(publicUrl);
 
       setState(() {
@@ -103,7 +103,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Foto de perfil actualizada ✅')),
+        const SnackBar(content: Text('Foto de perfil actualizada')),
       );
     } catch (e) {
       setState(() => _uploadingImage = false);
@@ -113,7 +113,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     }
   }
 
-  // 🔹 Actualizar nombre, correo y contraseña
+  // Actualizar nombre, correo y contraseña
   Future<void> _updateProfile() async {
     final user = _auth.currentUser;
     if (user == null) return;
@@ -143,7 +143,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
       }
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Perfil actualizado con éxito ✅')),
+        const SnackBar(content: Text('Perfil actualizado con éxito ')),
       );
     } on FirebaseAuthException catch (e) {
       String message = 'Error al actualizar el perfil.';
@@ -175,7 +175,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
         padding: const EdgeInsets.all(16.0),
         child: ListView(
           children: [
-            // 🔹 Imagen de perfil
+            // Imagen de perfil
             Center(
               child: Stack(
                 alignment: Alignment.bottomRight,

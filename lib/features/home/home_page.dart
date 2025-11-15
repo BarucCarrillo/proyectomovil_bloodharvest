@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:proyectomovil_bloodharvest/features/account/account_page.dart';
-import '../../core/services/auth_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../achievements/achievements_page.dart';
 import '../friends/friends_page.dart';
-import 'pages/news_page.dart';
+import '../posts/feed_page.dart';
+import '../inicio/inicio_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -21,14 +21,16 @@ class _HomePageState extends State<HomePage> {
   final List<Widget> _pages = const [
     AchievementsPage(),
     FriendsPage(),
-    NewsPage(),
+    InicioPage(),
+    FeedPage(),
     EditProfilePage(),
   ];
 
   final List<String> _titles = const [
     'Logros',
     'Amigos',
-    'Noticias',
+    'Inicio',
+    'Comunidad',
     'Configuración',
   ];
 
@@ -58,7 +60,7 @@ class _HomePageState extends State<HomePage> {
 
   //CAMBIAR PÁGINA Y REFRESCAR
   void _onItemTapped(int index) async {
-    if (index == 3) {
+    if (index == 4) {
       // SI SE ENTRA A CONFIGURACIÓN
       await Navigator.push(
         context,
@@ -87,11 +89,12 @@ class _HomePageState extends State<HomePage> {
             icon: Icon(Icons.emoji_events),
             label: 'Logros',
           ),
-          BottomNavigationBarItem(icon: Icon(Icons.people), label: 'Amigos'),
           BottomNavigationBarItem(
-            icon: Icon(Icons.newspaper),
-            label: 'Noticias',
+            icon: Icon(Icons.group_add_rounded),
+            label: 'Amigos',
           ),
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Inicio'),
+          BottomNavigationBarItem(icon: Icon(Icons.group), label: 'Comunidad'),
           BottomNavigationBarItem(
             icon: Icon(Icons.account_box),
             label: 'Cuenta',

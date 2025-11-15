@@ -7,6 +7,8 @@ import 'package:proyectomovil_bloodharvest/features/friends/friends_page.dart';
 import 'package:proyectomovil_bloodharvest/features/friends/requests_page.dart';
 import 'package:proyectomovil_bloodharvest/features/home/home_page.dart';
 import 'package:proyectomovil_bloodharvest/features/friends/chat_page.dart';
+import 'package:proyectomovil_bloodharvest/features/posts/feed_page.dart';
+import 'package:proyectomovil_bloodharvest/features/inicio/inicio_page.dart';
 import 'firebase_options.dart';
 import 'auth_wrapper.dart';
 
@@ -14,12 +16,12 @@ import 'auth_wrapper.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await Supabase.initialize(
     url: 'https://ljaswixhpkowjenkkdse.supabase.co',
     anonKey:
         'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxqYXN3aXhocGtvd2plbmtrZHNlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI2NzAxNjMsImV4cCI6MjA3ODI0NjE2M30.HGnJZac50LCPxnkCvQPa8vUkSpm04Utw616DVy0KRjw',
   );
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(const MyApp());
 }
 
@@ -104,6 +106,8 @@ class MyApp extends StatelessWidget {
         '/requests_page': (context) => const RequestsPage(),
         '/friends_achievements_page': (context) => RequestsPage(),
         '/account_page': (context) => EditProfilePage(),
+        '/feed_page': (context) => FeedPage(),
+        '/inicio_page': (context) => const InicioPage(),
       },
       onGenerateRoute: (settings) {
         if (settings.name == '/chat_page') {
