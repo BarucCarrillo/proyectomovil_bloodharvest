@@ -4,6 +4,9 @@ import 'package:image_picker/image_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:provider/provider.dart';
+import '../../providers/language_provider.dart';
+import '../../utils/texts.dart';
 
 class EditPostPage extends StatefulWidget {
   final String postId;
@@ -57,7 +60,7 @@ class _EditPostPageState extends State<EditPostPage> {
       final fileName =
           '${FirebaseAuth.instance.currentUser!.uid}_${DateTime.now().millisecondsSinceEpoch}.jpg';
 
-      final uploaded = await supabase.storage
+      await supabase.storage
           .from('posts')
           .upload(
             fileName,
@@ -65,9 +68,7 @@ class _EditPostPageState extends State<EditPostPage> {
             fileOptions: const FileOptions(upsert: true),
           );
 
-      final imageUrl = supabase.storage.from('posts').getPublicUrl(fileName);
-
-      return imageUrl;
+      return supabase.storage.from('posts').getPublicUrl(fileName);
     } catch (e) {
       print("Error al subir imagen: $e");
       return null;
@@ -81,13 +82,11 @@ class _EditPostPageState extends State<EditPostPage> {
 
     String updatedImageUrl = widget.imageUrl;
 
-    // Si cambió la imagen
     if (newImageFile != null) {
       final url = await uploadImageToSupabase(newImageFile!);
       if (url != null) updatedImageUrl = url;
     }
 
-    // Actualizar Firestore
     await FirebaseFirestore.instance
         .collection("posts")
         .doc(widget.postId)
@@ -100,13 +99,15 @@ class _EditPostPageState extends State<EditPostPage> {
 
     setState(() => isLoading = false);
 
-    Navigator.pop(context); // regresar al feed
+    Navigator.pop(context);
   }
 
   @override
   Widget build(BuildContext context) {
+    final isEnglish = Provider.of<LanguageProvider>(context).isEnglish;
+
     return Scaffold(
-      appBar: AppBar(title: const Text("Editar publicación")),
+      appBar: AppBar(title: Text(Texts.t("editPost", isEnglish))),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : SingleChildScrollView(
@@ -130,17 +131,13 @@ class _EditPostPageState extends State<EditPostPage> {
                                       widget.imageUrl,
                                       height: 200,
                                       fit: BoxFit.cover,
-                                      errorBuilder:
-                                          (context, error, stackTrace) {
-                                            return Container(
-                                              height: 200,
-                                              color: Colors.grey.shade300,
-                                              child: const Icon(
-                                                Icons.broken_image,
-                                                size: 30,
-                                              ),
-                                            );
-                                          },
+                                      errorBuilder: (_, __, ___) {
+                                        return Container(
+                                          height: 200,
+                                          color: Colors.grey.shade300,
+                                          child: const Icon(Icons.broken_image),
+                                        );
+                                      },
                                     )
                                   : Container(
                                       height: 200,
@@ -152,30 +149,37 @@ class _EditPostPageState extends State<EditPostPage> {
                                     )),
                       ),
                     ),
+
                     const SizedBox(height: 20),
 
                     TextFormField(
                       controller: _titleController,
-                      decoration: const InputDecoration(labelText: "Título"),
-                      validator: (value) =>
-                          value!.isEmpty ? "No puede estar vacío" : null,
+                      decoration: InputDecoration(
+                        labelText: Texts.t("title", isEnglish),
+                      ),
+                      validator: (value) => value!.isEmpty
+                          ? Texts.t("fillAllFields", isEnglish)
+                          : null,
                     ),
 
                     const SizedBox(height: 20),
 
                     TextFormField(
                       controller: _contentController,
-                      decoration: const InputDecoration(labelText: "Contenido"),
+                      decoration: InputDecoration(
+                        labelText: Texts.t("content", isEnglish),
+                      ),
                       maxLines: 5,
-                      validator: (value) =>
-                          value!.isEmpty ? "No puede estar vacío" : null,
+                      validator: (value) => value!.isEmpty
+                          ? Texts.t("fillAllFields", isEnglish)
+                          : null,
                     ),
 
                     const SizedBox(height: 30),
 
                     ElevatedButton(
                       onPressed: saveChanges,
-                      child: const Text("Guardar cambios"),
+                      child: Text(Texts.t("saveChanges", isEnglish)),
                     ),
                   ],
                 ),

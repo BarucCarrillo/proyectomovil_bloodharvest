@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'achievements_service.dart';
+import '../../utils/texts.dart';
+import 'package:provider/provider.dart';
+import '../../providers/language_provider.dart';
 
 class EditAchievementDialog extends StatefulWidget {
   final String achievementId;
@@ -38,9 +41,10 @@ class _EditAchievementDialogState extends State<EditAchievementDialog> {
   @override
   Widget build(BuildContext context) {
     final achievementsService = AchievementsService();
+    final isEnglish = Provider.of<LanguageProvider>(context).isEnglish;
 
     return AlertDialog(
-      title: const Text('Editar Logro'),
+      title: Text(Texts.t("editAchievement", isEnglish)),
       content: Form(
         key: _formKey,
         child: SingleChildScrollView(
@@ -49,20 +53,25 @@ class _EditAchievementDialogState extends State<EditAchievementDialog> {
             children: [
               TextFormField(
                 controller: _titleController,
-                decoration: const InputDecoration(labelText: 'Título'),
-                validator: (value) =>
-                    value!.isEmpty ? 'Ingresa un título' : null,
+                decoration: InputDecoration(
+                  labelText: Texts.t("achievementTitle", isEnglish),
+                ),
+                validator: (value) => value!.isEmpty
+                    ? Texts.t("achievementTitle", isEnglish)
+                    : null,
               ),
               TextFormField(
                 controller: _descriptionController,
-                decoration: const InputDecoration(labelText: 'Descripción'),
+                decoration: InputDecoration(
+                  labelText: Texts.t("description", isEnglish),
+                ),
                 validator: (value) =>
-                    value!.isEmpty ? 'Ingresa una descripción' : null,
+                    value!.isEmpty ? Texts.t("description", isEnglish) : null,
               ),
               const SizedBox(height: 12),
               Row(
                 children: [
-                  const Text("Fecha: "),
+                  Text(Texts.t("Date", isEnglish)),
                   TextButton(
                     onPressed: () async {
                       final pickedDate = await showDatePicker(
@@ -89,7 +98,7 @@ class _EditAchievementDialogState extends State<EditAchievementDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text('Cancelar'),
+          child: Text(Texts.t("Cancel", isEnglish)),
         ),
         ElevatedButton(
           onPressed: () async {
@@ -103,7 +112,7 @@ class _EditAchievementDialogState extends State<EditAchievementDialog> {
               Navigator.pop(context);
             }
           },
-          child: const Text('Guardar'),
+          child: Text(Texts.t("Save", isEnglish)),
         ),
       ],
     );

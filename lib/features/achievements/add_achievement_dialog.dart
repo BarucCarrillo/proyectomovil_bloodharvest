@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'achievements_service.dart';
+import '../../utils/texts.dart';
+import '../../providers/language_provider.dart';
+import 'package:provider/provider.dart';
 
 class AddAchievementDialog extends StatefulWidget {
   const AddAchievementDialog({super.key});
@@ -15,26 +18,32 @@ class _AddAchievementDialogState extends State<AddAchievementDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final isEnglish = Provider.of<LanguageProvider>(context).isEnglish;
+
     return AlertDialog(
-      title: const Text('Agregar nuevo logro'),
+      title: Text(Texts.t("addAchievement", isEnglish)),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           TextField(
             controller: _titleController,
-            decoration: const InputDecoration(labelText: 'Título del Logro'),
+            decoration: InputDecoration(
+              labelText: Texts.t("achievementTitle", isEnglish),
+            ),
           ),
           const SizedBox(height: 10),
           TextField(
             controller: _descController,
-            decoration: const InputDecoration(labelText: 'Descripción'),
+            decoration: InputDecoration(
+              labelText: Texts.t("description", isEnglish),
+            ),
           ),
         ],
       ),
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text('Cancelar'),
+          child: Text(Texts.t("cancel", isEnglish)),
         ),
         ElevatedButton(
           onPressed: _isLoading
@@ -43,10 +52,13 @@ class _AddAchievementDialogState extends State<AddAchievementDialog> {
                   if (_titleController.text.isEmpty) return;
 
                   setState(() => _isLoading = true);
+
                   await AchievementsService().addAchievements(
                     _titleController.text.trim(),
                     _descController.text.trim(),
                   );
+
+                  Navigator.pop(context);
                 },
           child: _isLoading
               ? const SizedBox(
@@ -54,7 +66,7 @@ class _AddAchievementDialogState extends State<AddAchievementDialog> {
                   width: 16,
                   child: CircularProgressIndicator(strokeWidth: 2),
                 )
-              : const Text('Guardar'),
+              : Text(Texts.t("save", isEnglish)),
         ),
       ],
     );

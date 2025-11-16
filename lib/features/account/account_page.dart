@@ -5,6 +5,9 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:proyectomovil_bloodharvest/core/services/auth_service.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
+import '../../providers/language_provider.dart';
+import '../../utils/texts.dart';
+import 'package:provider/provider.dart';
 
 class EditProfilePage extends StatefulWidget {
   const EditProfilePage({super.key});
@@ -36,7 +39,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
     _loadUserData();
   }
 
-  // Cargar los datos actuales del usuario
   Future<void> _loadUserData() async {
     final user = _auth.currentUser;
     if (user == null) return;
@@ -54,17 +56,13 @@ class _EditProfilePageState extends State<EditProfilePage> {
     }
   }
 
-  //Seleccionar imagen de galería
   Future<void> _pickImage() async {
     final picked = await _picker.pickImage(source: ImageSource.gallery);
     if (picked != null) {
-      setState(() {
-        _imageFile = File(picked.path);
-      });
+      setState(() => _imageFile = File(picked.path));
     }
   }
 
-  //Subir imagen a Firebase Storage y actualizar Firestore/Auth
   Future<void> _uploadProfileImage() async {
     if (_imageFile == null) return;
 
@@ -74,7 +72,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
       final user = _auth.currentUser!;
       final filePath = 'profile_images/${user.uid}.jpeg';
 
-      //Subir imagen a Supabase
       await supabase.storage
           .from('profile_images')
           .upload(
@@ -87,12 +84,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
           supabase.storage.from('profile_images').getPublicUrl(filePath) +
           '?v=${DateTime.now().millisecondsSinceEpoch}';
 
-      //Actualizar Firestore
       await _firestore.collection('users').doc(user.uid).update({
         'photoUrl': publicUrl,
       });
 
-      //Actualizar en Firebase Auth
       await user.updatePhotoURL(publicUrl);
 
       setState(() {
@@ -101,18 +96,17 @@ class _EditProfilePageState extends State<EditProfilePage> {
         _imageFile = null;
       });
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Foto de perfil actualizada')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(Texts.t("saveImage", true))));
     } catch (e) {
       setState(() => _uploadingImage = false);
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text('Error al subir la imagen: $e')));
+      ).showSnackBar(SnackBar(content: Text('Error: $e')));
     }
   }
 
-  // Actualizar nombre, correo y contraseña
   Future<void> _updateProfile() async {
     final user = _auth.currentUser;
     if (user == null) return;
@@ -130,33 +124,22 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
       if (newEmail.isNotEmpty && newEmail != user.email) {
         await user.verifyBeforeUpdateEmail(newEmail);
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Se envió un correo de verificación al nuevo email.'),
-          ),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text("Email verification sent")));
       }
 
       if (newPassword.isNotEmpty && newPassword.length >= 6) {
         await user.updatePassword(newPassword);
       }
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Perfil actualizado con éxito ')),
-      );
-    } on FirebaseAuthException catch (e) {
-      String message = 'Error al actualizar el perfil.';
-      if (e.code == 'requires-recent-login') {
-        message =
-            'Debes iniciar sesión nuevamente para cambiar correo o contraseña.';
-      }
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text(message)));
+      ).showSnackBar(SnackBar(content: Text("Profile updated")));
     } catch (e) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text('Ocurrió un error: $e')));
+      ).showSnackBar(SnackBar(content: Text('Error: $e')));
     } finally {
       setState(() => _updating = false);
     }
@@ -164,17 +147,19 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
   @override
   Widget build(BuildContext context) {
+    final lang = Provider.of<LanguageProvider>(context);
+    final isEng = lang.isEnglish;
+
     if (_loading) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Editar Perfil')),
+      appBar: AppBar(title: Text(Texts.t("editProfile", isEng))),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: ListView(
           children: [
-            // Imagen de perfil
             Center(
               child: Stack(
                 alignment: Alignment.bottomRight,
@@ -197,42 +182,52 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 ],
               ),
             ),
+
             const SizedBox(height: 12),
+
             if (_imageFile != null)
               ElevatedButton.icon(
                 onPressed: _uploadingImage ? null : _uploadProfileImage,
                 icon: const Icon(Icons.upload),
-                label: _uploadingImage
-                    ? const Text('Subiendo...')
-                    : const Text('Guardar Imagen'),
+                label: Text(
+                  _uploadingImage
+                      ? Texts.t("uploading", isEng)
+                      : Texts.t("saveImage", isEng),
+                ),
               ),
 
             const SizedBox(height: 24),
+
             TextField(
               controller: _nameController,
-              decoration: const InputDecoration(
-                labelText: 'Nombre',
-                prefixIcon: Icon(Icons.person),
+              decoration: InputDecoration(
+                labelText: Texts.t("name", isEng),
+                prefixIcon: const Icon(Icons.person),
               ),
             ),
+
             const SizedBox(height: 12),
+
             TextField(
               controller: _emailController,
-              decoration: const InputDecoration(
-                labelText: 'Correo electrónico',
-                prefixIcon: Icon(Icons.email),
+              decoration: InputDecoration(
+                labelText: Texts.t("email", isEng),
+                prefixIcon: const Icon(Icons.email),
               ),
               keyboardType: TextInputType.emailAddress,
             ),
+
             const SizedBox(height: 12),
+
             TextField(
               controller: _passwordController,
-              decoration: const InputDecoration(
-                labelText: 'Nueva contraseña (opcional)',
-                prefixIcon: Icon(Icons.lock),
+              decoration: InputDecoration(
+                labelText: Texts.t("newPassword", isEng),
+                prefixIcon: const Icon(Icons.lock),
               ),
               obscureText: true,
             ),
+
             const SizedBox(height: 24),
 
             ElevatedButton.icon(
@@ -245,8 +240,16 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 }
               },
               icon: const Icon(Icons.logout),
-              label: const Text('Cerrar Sesión'),
+              label: Text(Texts.t("logout", isEng)),
             ),
+
+            const SizedBox(height: 24),
+
+            ElevatedButton(
+              onPressed: () => lang.toggleLanguage(),
+              child: Text(Texts.t("changeLanguage", isEng)),
+            ),
+
             const SizedBox(height: 24),
 
             ElevatedButton.icon(
@@ -258,7 +261,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       height: 20,
                       child: CircularProgressIndicator(strokeWidth: 2),
                     )
-                  : const Text('Guardar Cambios'),
+                  : Text(Texts.t("saveChanges", isEng)),
             ),
           ],
         ),

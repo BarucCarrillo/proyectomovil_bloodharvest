@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-
-// FORMULARIO DE AUTENTICACION PARA LOGIN Y REGISTRO
+import 'package:provider/provider.dart';
+import '../../../providers/language_provider.dart';
+import '../../../utils/texts.dart';
 
 class AuthForm extends StatefulWidget {
   final bool isLogin;
@@ -42,6 +43,8 @@ class _AuthFormState extends State<AuthForm> {
 
   @override
   Widget build(BuildContext context) {
+    final isEnglish = Provider.of<LanguageProvider>(context).isEnglish;
+
     return Card(
       shadowColor: Colors.black,
       color: Colors.brown,
@@ -53,45 +56,60 @@ class _AuthFormState extends State<AuthForm> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+              // NOMBRE SOLO EN REGISTRO
               if (!widget.isLogin)
                 TextFormField(
                   controller: nameCtrl,
-                  decoration: const InputDecoration(
-                    labelText: 'Nombre de Usuario',
-                    labelStyle: TextStyle(color: Colors.black),
+                  decoration: InputDecoration(
+                    labelText: Texts.t("name", isEnglish),
+                    labelStyle: const TextStyle(color: Colors.black),
                   ),
-                  validator: (v) =>
-                      v == null || v.isEmpty ? 'Ingresa tu nombre' : null,
+                  validator: (v) => v == null || v.isEmpty
+                      ? Texts.t("fillAllFields", isEnglish)
+                      : null,
                 ),
+
+              // CORREO
               TextFormField(
                 controller: emailCtrl,
-                decoration: const InputDecoration(
-                  labelText: 'Correo',
-                  labelStyle: TextStyle(color: Colors.black),
+                decoration: InputDecoration(
+                  labelText: Texts.t("email", isEnglish),
+                  labelStyle: const TextStyle(color: Colors.black),
                 ),
                 keyboardType: TextInputType.emailAddress,
-                validator: (v) =>
-                    v != null && v.contains('@') ? null : 'Correo Invalido',
+                validator: (v) => v != null && v.contains('@')
+                    ? null
+                    : Texts.t("invalidUserId", isEnglish),
               ),
+
+              // CONTRASEÑA
               TextFormField(
                 controller: passCtrl,
-                decoration: const InputDecoration(
-                  labelText: 'Contraseña',
-                  labelStyle: TextStyle(color: Colors.black),
+                decoration: InputDecoration(
+                  labelText: Texts.t("password", isEnglish),
+                  labelStyle: const TextStyle(color: Colors.black),
                 ),
                 obscureText: true,
-                validator: (v) =>
-                    v != null && v.length >= 8 ? null : 'Minimo 8 caracteres',
+                validator: (v) => v != null && v.length >= 8
+                    ? null
+                    : Texts.t("fillAllFields", isEnglish),
               ),
+
               if (isLoading) const CircularProgressIndicator(),
-              if (!isLoading) SizedBox(height: 20),
+              if (!isLoading) const SizedBox(height: 20),
+
+              // BOTÓN TRADUCIDO
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.brown[300],
                   foregroundColor: Colors.white,
                 ),
                 onPressed: submit,
-                child: Text(widget.isLogin ? 'Entrar' : 'Registrar'),
+                child: Text(
+                  widget.isLogin
+                      ? Texts.t("login", isEnglish) // Entrar
+                      : Texts.t("register", isEnglish), // Registrar
+                ),
               ),
             ],
           ),

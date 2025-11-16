@@ -2,17 +2,21 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import './services/friends_service.dart';
+import 'package:provider/provider.dart';
+import '../../providers/language_provider.dart';
+import '../../utils/texts.dart';
 
 class RequestsPage extends StatelessWidget {
   const RequestsPage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final isEnglish = Provider.of<LanguageProvider>(context).isEnglish;
     final user = FirebaseAuth.instance.currentUser!;
     final service = FriendsService();
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Solicitudes de Amistad')),
+      appBar: AppBar(title: Text(Texts.t("friendRequests", isEnglish))),
       body: StreamBuilder<DocumentSnapshot>(
         stream: FirebaseFirestore.instance
             .collection('users')
@@ -22,13 +26,12 @@ class RequestsPage extends StatelessWidget {
           if (!snapshot.hasData) {
             return const Center(child: CircularProgressIndicator());
           }
+
           final data = snapshot.data!.data() as Map<String, dynamic>;
           final received = List<String>.from(data['request_received'] ?? []);
 
           if (received.isEmpty) {
-            return const Center(
-              child: Text('No tienes solicitudes pendientes.'),
-            );
+            return Center(child: Text(Texts.t("noPendingRequests", isEnglish)));
           }
 
           return ListView.builder(
@@ -36,10 +39,10 @@ class RequestsPage extends StatelessWidget {
             itemBuilder: (context, index) {
               final requesterId = received[index];
 
-              if (requesterId == null || requesterId.isEmpty) {
-                return const ListTile(
-                  title: Text('Solicitud inválida'),
-                  subtitle: Text('El ID del usuario no es válido.'),
+              if (requesterId.isEmpty) {
+                return ListTile(
+                  title: Text(Texts.t("invalidRequest", isEnglish)),
+                  subtitle: Text(Texts.t("invalidUserId", isEnglish)),
                 );
               }
 
@@ -53,7 +56,7 @@ class RequestsPage extends StatelessWidget {
                   final requester = snap.data!.data() as Map<String, dynamic>;
 
                   return ListTile(
-                    title: Text(requester['displayName'] ?? []),
+                    title: Text(requester['displayName'] ?? ''),
                     subtitle: Text(requester['email']),
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,

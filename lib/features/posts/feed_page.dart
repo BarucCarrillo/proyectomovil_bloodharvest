@@ -2,9 +2,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:provider/provider.dart';
 import 'create_post_page.dart';
 import 'edit_post_page.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+
+import '../../providers/language_provider.dart';
+import '../../utils/texts.dart';
 
 class FeedPage extends StatefulWidget {
   const FeedPage({super.key});
@@ -56,19 +60,16 @@ class _FeedPageState extends State<FeedPage> {
     return DateFormat('dd/MM/yyyy • hh:mm a').format(date);
   }
 
-  // ELIMINAR POST (Firestore + Supabase)
   Future<void> _deletePost(DocumentSnapshot post) async {
     final data = post.data() as Map<String, dynamic>;
     final imageUrl = data["imageUrl"];
 
     try {
-      //eliminar imagen del storage si existe
       if (imageUrl != null && imageUrl.toString().isNotEmpty) {
         final path = imageUrl.split("/public/").last;
         await supabase.storage.from("posts").remove([path]);
       }
 
-      // eliminar documento
       await post.reference.delete();
 
       if (mounted) {
@@ -83,8 +84,8 @@ class _FeedPageState extends State<FeedPage> {
     }
   }
 
-  //Menú de opciones para edición/eliminación
   Widget _buildPostMenu(Map<String, dynamic> data, DocumentSnapshot post) {
+    final lang = Provider.of<LanguageProvider>(context);
     final uid = _auth.currentUser!.uid;
 
     if (data["authorId"] != uid) {
@@ -110,19 +111,23 @@ class _FeedPageState extends State<FeedPage> {
         }
       },
       itemBuilder: (_) => [
-        const PopupMenuItem(
+        PopupMenuItem(
           value: "edit",
           child: Row(
-            children: [Icon(Icons.edit), SizedBox(width: 8), Text("Editar")],
+            children: [
+              const Icon(Icons.edit),
+              const SizedBox(width: 8),
+              Text(Texts.t("edit", lang.isEnglish)),
+            ],
           ),
         ),
-        const PopupMenuItem(
+        PopupMenuItem(
           value: "delete",
           child: Row(
             children: [
-              Icon(Icons.delete, color: Colors.red),
-              SizedBox(width: 8),
-              Text("Eliminar"),
+              const Icon(Icons.delete, color: Colors.red),
+              const SizedBox(width: 8),
+              Text(Texts.t("delete", lang.isEnglish)),
             ],
           ),
         ),
@@ -132,8 +137,10 @@ class _FeedPageState extends State<FeedPage> {
 
   @override
   Widget build(BuildContext context) {
+    final lang = Provider.of<LanguageProvider>(context);
+
     return Scaffold(
-      appBar: AppBar(title: const Text("Publicaciones")),
+      appBar: AppBar(title: Text(Texts.t("posts", lang.isEnglish))),
 
       body: RefreshIndicator(
         onRefresh: _refresh,
@@ -148,7 +155,7 @@ class _FeedPageState extends State<FeedPage> {
             }
 
             if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-              return const Center(child: Text("No hay publicaciones aún."));
+              return Center(child: Text(Texts.t("noPosts", lang.isEnglish)));
             }
 
             final posts = snapshot.data!.docs;
@@ -170,7 +177,6 @@ class _FeedPageState extends State<FeedPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Imagen
                       if (data["imageUrl"] != null &&
                           data["imageUrl"].toString().isNotEmpty)
                         ClipRRect(
@@ -200,8 +206,6 @@ class _FeedPageState extends State<FeedPage> {
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
-
-                                //MENÚ EDITAR / ELIMINAR
                                 _buildPostMenu(data, post),
                               ],
                             ),
@@ -249,7 +253,6 @@ class _FeedPageState extends State<FeedPage> {
         ),
       ),
 
-      // Botones flotantes
       floatingActionButton: Column(
         mainAxisSize: MainAxisSize.min,
         children: [

@@ -1,4 +1,4 @@
-//PANTALLA DE LOGIN Y REGISTRO
+// PANTALLA DE LOGIN Y REGISTRO
 
 import 'package:flutter/material.dart';
 import '../widgets/auth_form..dart';
@@ -13,6 +13,8 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   bool isLogin = true;
+  bool isEnglish = false;
+
   final AuthService _authService = AuthService();
 
   void _handleAuth(String email, String password, [String? displayName]) async {
@@ -37,14 +39,13 @@ class _LoginPageState extends State<LoginPage> {
         await _authService.registerWithEmail(
           email,
           password,
-          displayName ?? 'JUgador',
+          displayName ?? (isEnglish ? "Player" : "Jugador"),
         );
       }
-    } on Exception catch (e) {
-      final message = (e.toString());
+    } catch (e) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text(message)));
+      ).showSnackBar(SnackBar(content: Text(e.toString())));
     }
   }
 
@@ -57,14 +58,18 @@ class _LoginPageState extends State<LoginPage> {
         centerTitle: true,
         titleSpacing: 0,
         toolbarHeight: 180,
+        actions: [],
         title: Text(
-          'Bienvenido a la\n comunidad de\n Blood Harvest\n\n ${isLogin ? 'Iniciar Sesión' : 'Crear Cuenta'}',
-          style: TextStyle(
+          isEnglish
+              ? "Welcome to the\n Blood Harvest\n community\n\n ${isLogin ? 'Login' : 'Create Account'}"
+              : "Bienvenido a la\n comunidad de\n Blood Harvest\n\n ${isLogin ? 'Iniciar Sesión' : 'Crear Cuenta'}",
+          style: const TextStyle(
             fontSize: 26,
             fontWeight: FontWeight.bold,
             color: Colors.white,
             letterSpacing: 2.5,
           ),
+          textAlign: TextAlign.center,
         ),
       ),
       body: Center(
@@ -72,26 +77,40 @@ class _LoginPageState extends State<LoginPage> {
           mainAxisSize: MainAxisSize.min,
           children: [
             AuthForm(isLogin: isLogin, onSubmit: _handleAuth),
-            SizedBox(height: 20),
+
+            const SizedBox(height: 20),
+
             TextButton(
               style: TextButton.styleFrom(
                 backgroundColor: Colors.brown,
                 foregroundColor: Colors.white,
-                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 12,
+                ),
               ),
               onPressed: () => setState(() => isLogin = !isLogin),
               child: Text(
-                isLogin
-                    ? '¿No tienes cuenta? Registrate'
-                    : '¿Ya tienes cuenta? Inicia Sesión',
+                isEnglish
+                    ? (isLogin
+                          ? "Don't have an account? Register"
+                          : "Already have an account? Login")
+                    : (isLogin
+                          ? "¿No tienes cuenta? Regístrate"
+                          : "¿Ya tienes cuenta? Inicia Sesión"),
               ),
             ),
-            if (isLogin) SizedBox(height: 20),
+
+            if (isLogin) const SizedBox(height: 20),
+
             TextButton(
               style: TextButton.styleFrom(
                 backgroundColor: Colors.brown,
                 foregroundColor: Colors.white,
-                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 12,
+                ),
               ),
               onPressed: () async {
                 final email = await _askForEmail(context);
@@ -99,8 +118,12 @@ class _LoginPageState extends State<LoginPage> {
                   try {
                     await _authService.sendPasswordResetEmail(email);
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Email de recuperación enviado'),
+                      SnackBar(
+                        content: Text(
+                          isEnglish
+                              ? "Recovery email sent"
+                              : "Email de recuperación enviado",
+                        ),
                       ),
                     );
                   } catch (e) {
@@ -110,7 +133,15 @@ class _LoginPageState extends State<LoginPage> {
                   }
                 }
               },
-              child: const Text('Olvidé mi contraseña'),
+              child: Text(
+                isEnglish ? "Forgot my password" : "Olvidé mi contraseña",
+              ),
+            ),
+            IconButton(
+              icon: const Icon(Icons.language, color: Colors.white, size: 50),
+              onPressed: () {
+                setState(() => isEnglish = !isEnglish);
+              },
             ),
           ],
         ),
@@ -123,19 +154,21 @@ class _LoginPageState extends State<LoginPage> {
     return showDialog(
       context: ctx,
       builder: (c) => AlertDialog(
-        title: const Text('Recuperar Contraseña'),
+        title: Text(isEnglish ? "Recover Password" : "Recuperar Contraseña"),
         content: TextField(
           controller: ctrl,
-          decoration: const InputDecoration(hintText: 'Tu Correo'),
+          decoration: InputDecoration(
+            hintText: isEnglish ? "Your email" : "Tu correo",
+          ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(c).pop(),
-            child: const Text('Cancelar'),
+            child: Text(isEnglish ? "Cancel" : "Cancelar"),
           ),
           TextButton(
             onPressed: () => Navigator.of(c).pop(ctrl.text.trim()),
-            child: const Text('Enviar'),
+            child: Text(isEnglish ? "Send" : "Enviar"),
           ),
         ],
       ),

@@ -11,6 +11,8 @@ import 'package:proyectomovil_bloodharvest/features/posts/feed_page.dart';
 import 'package:proyectomovil_bloodharvest/features/inicio/inicio_page.dart';
 import 'firebase_options.dart';
 import 'auth_wrapper.dart';
+import 'package:provider/provider.dart';
+import 'providers/language_provider.dart';
 
 //FUNCION PRINCIPAL PARA INICIAR LA APLICACION
 
@@ -22,7 +24,12 @@ void main() async {
         'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxqYXN3aXhocGtvd2plbmtrZHNlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI2NzAxNjMsImV4cCI6MjA3ODI0NjE2M30.HGnJZac50LCPxnkCvQPa8vUkSpm04Utw616DVy0KRjw',
   );
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  runApp(const MyApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (_) => LanguageProvider(),
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {

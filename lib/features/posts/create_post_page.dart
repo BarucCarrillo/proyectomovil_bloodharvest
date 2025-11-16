@@ -4,6 +4,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:provider/provider.dart';
+import '../../providers/language_provider.dart';
+import '../../utils/texts.dart';
 
 class CreatePostPage extends StatefulWidget {
   const CreatePostPage({super.key});
@@ -23,22 +26,23 @@ class _CreatePostPageState extends State<CreatePostPage> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  // Seleccionar imagen
   Future<void> _pickImage() async {
     final picked = await _picker.pickImage(source: ImageSource.gallery);
     if (picked != null) {
-      setState(() {
-        _imageFile = File(picked.path);
-      });
+      setState(() => _imageFile = File(picked.path));
     }
   }
 
-  // Subir publicación
   Future<void> _submitPost() async {
+    final isEnglish = Provider.of<LanguageProvider>(
+      context,
+      listen: false,
+    ).isEnglish;
+
     if (_titleController.text.trim().isEmpty ||
         _contentController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Completa todos los campos")),
+        SnackBar(content: Text(Texts.t("fillAllFields", isEnglish))),
       );
       return;
     }
@@ -49,7 +53,6 @@ class _CreatePostPageState extends State<CreatePostPage> {
       final user = _auth.currentUser!;
       String? imageUrl;
 
-      //Subir imagen a Supabase (si existe)
       if (_imageFile != null) {
         final filePath =
             "posts/${user.uid}_${DateTime.now().millisecondsSinceEpoch}.jpg";
@@ -65,25 +68,24 @@ class _CreatePostPageState extends State<CreatePostPage> {
         imageUrl = supabase.storage.from("posts").getPublicUrl(filePath);
       }
 
-      // Guardar en Firestore
       await _firestore.collection("posts").add({
         "title": _titleController.text.trim(),
         "content": _contentController.text.trim(),
         "imageUrl": imageUrl ?? "",
         "authorId": user.uid,
-        "authorName": user.displayName ?? "Usuario",
+        "authorName": user.displayName ?? "User",
         "createdAt": FieldValue.serverTimestamp(),
       });
 
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text("Publicación creada")));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(Texts.t("postCreated", isEnglish))),
+      );
 
       Navigator.pop(context);
     } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text("Error al publicar: $e")));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("${Texts.t("postError", isEnglish)} $e")),
+      );
     } finally {
       setState(() => _loading = false);
     }
@@ -91,36 +93,37 @@ class _CreatePostPageState extends State<CreatePostPage> {
 
   @override
   Widget build(BuildContext context) {
+    final isEnglish = Provider.of<LanguageProvider>(context).isEnglish;
+
     return Scaffold(
-      appBar: AppBar(title: const Text("Crear publicación")),
+      appBar: AppBar(title: Text(Texts.t("createPost", isEnglish))),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: ListView(
           children: [
             TextField(
               controller: _titleController,
-              decoration: const InputDecoration(
-                labelText: "Título",
-                prefixIcon: Icon(Icons.title),
+              decoration: InputDecoration(
+                labelText: Texts.t("title", isEnglish),
+                prefixIcon: const Icon(Icons.title),
               ),
             ),
             const SizedBox(height: 12),
             TextField(
               controller: _contentController,
               maxLines: 5,
-              decoration: const InputDecoration(
-                labelText: "Contenido",
-                prefixIcon: Icon(Icons.edit),
+              decoration: InputDecoration(
+                labelText: Texts.t("content", isEnglish),
+                prefixIcon: const Icon(Icons.edit),
               ),
             ),
             const SizedBox(height: 12),
 
-            // Imagen
             if (_imageFile != null) Image.file(_imageFile!, height: 200),
 
             TextButton.icon(
               icon: const Icon(Icons.image),
-              label: const Text("Seleccionar imagen"),
+              label: Text(Texts.t("selectImage", isEnglish)),
               onPressed: _pickImage,
             ),
 
@@ -131,7 +134,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
               icon: const Icon(Icons.send),
               label: _loading
                   ? const CircularProgressIndicator()
-                  : const Text("Publicar"),
+                  : Text(Texts.t("publish", isEnglish)),
             ),
           ],
         ),
