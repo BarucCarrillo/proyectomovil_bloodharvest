@@ -77,7 +77,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
 
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text("Publicación creada 🎉")));
+      ).showSnackBar(const SnackBar(content: Text("Publicación creada")));
 
       Navigator.pop(context);
     } catch (e) {

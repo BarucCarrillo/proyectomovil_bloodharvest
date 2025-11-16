@@ -56,19 +56,19 @@ class _FeedPageState extends State<FeedPage> {
     return DateFormat('dd/MM/yyyy • hh:mm a').format(date);
   }
 
-  // 🔥 ELIMINAR POST (Firestore + Supabase)
+  // ELIMINAR POST (Firestore + Supabase)
   Future<void> _deletePost(DocumentSnapshot post) async {
     final data = post.data() as Map<String, dynamic>;
     final imageUrl = data["imageUrl"];
 
     try {
-      // 1️⃣ eliminar imagen del storage si existe
+      //eliminar imagen del storage si existe
       if (imageUrl != null && imageUrl.toString().isNotEmpty) {
         final path = imageUrl.split("/public/").last;
         await supabase.storage.from("posts").remove([path]);
       }
 
-      // 2️⃣ eliminar documento
+      // eliminar documento
       await post.reference.delete();
 
       if (mounted) {
@@ -83,7 +83,7 @@ class _FeedPageState extends State<FeedPage> {
     }
   }
 
-  // 🔥 Menú de opciones para edición/eliminación
+  //Menú de opciones para edición/eliminación
   Widget _buildPostMenu(Map<String, dynamic> data, DocumentSnapshot post) {
     final uid = _auth.currentUser!.uid;
 
@@ -201,7 +201,7 @@ class _FeedPageState extends State<FeedPage> {
                                   ),
                                 ),
 
-                                // 🔥 MENÚ EDITAR / ELIMINAR
+                                //MENÚ EDITAR / ELIMINAR
                                 _buildPostMenu(data, post),
                               ],
                             ),

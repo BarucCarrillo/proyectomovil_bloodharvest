@@ -74,7 +74,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
       final user = _auth.currentUser!;
       final filePath = 'profile_images/${user.uid}.jpeg';
 
-      //Subir imagen a Supabase Storage
+      //Subir imagen a Supabase
       await supabase.storage
           .from('profile_images')
           .upload(
@@ -83,10 +83,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
             fileOptions: const FileOptions(upsert: true),
           );
 
-      //Obtener URL pública
-      final publicUrl = supabase.storage
-          .from('profile_images')
-          .getPublicUrl(filePath);
+      final publicUrl =
+          supabase.storage.from('profile_images').getPublicUrl(filePath) +
+          '?v=${DateTime.now().millisecondsSinceEpoch}';
 
       //Actualizar Firestore
       await _firestore.collection('users').doc(user.uid).update({

@@ -81,7 +81,7 @@ class _EditPostPageState extends State<EditPostPage> {
 
     String updatedImageUrl = widget.imageUrl;
 
-    // Si cambió la imagen → subir a Supabase
+    // Si cambió la imagen
     if (newImageFile != null) {
       final url = await uploadImageToSupabase(newImageFile!);
       if (url != null) updatedImageUrl = url;
